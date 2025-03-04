@@ -55,4 +55,13 @@ jobs:
         # rm pipeline tests, we will not longer need it after integrate with bamboo-engine
         rm -rf pipeline/tests
         # run unittest
-        python manage.py test
+        coverage python manage.py test
+        # export xml
+        coverage xml
+        # print report
+        coverage report
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: zhouwe1/bk-sops
