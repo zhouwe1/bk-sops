@@ -16,7 +16,7 @@ omit =
     packages/*
     weixin/*
     plugin_service/*
-
+    api/*
 
 [xml]
 output = coverage.xml
