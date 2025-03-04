@@ -1,9 +1,9 @@
 ![](docs/resource/img/logo_zh.png)
 ---
-[![license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/TencentBlueKing/bk-sops/blob/master/LICENSE)
-[![travis-ci](https://travis-ci.com/TencentBlueKing/bk-sops.svg?branch=master)](https://travis-ci.com/TencentBlueKing/bk-sops)
-[![Coverage Status](https://codecov.io/gh/TencentBlueKing/bk-sops/branch/master/graph/badge.svg)](https://codecov.io/gh/TencentBlueKing/bk-sops)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TencentBlueKing/bk-sops/pulls)
+[![license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/zhouwe1/bk-sops/blob/master/LICENSE)
+[![travis-ci](https://travis-ci.com/TencentBlueKing/bk-sops.svg?branch=master)](https://travis-ci.com/zhouwe1/bk-sops)
+[![Coverage Status](https://codecov.io/gh/TencentBlueKing/bk-sops/branch/master/graph/badge.svg)](https://codecov.io/gh/zhouwe1/bk-sops)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/zhouwe1/bk-sops/pulls)
 
 [(English Documents Available)](readme_en.md)
 
@@ -90,5 +90,7 @@
 
 ## License
 标准运维是基于 MIT 协议， 详细请参考 [LICENSE](LICENSE.txt) 。
+
+
 
 我们承诺未来不会更改适用于交付给任何人的当前项目版本的开源许可证（MIT 协议）。
