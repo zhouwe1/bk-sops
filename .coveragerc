@@ -15,7 +15,7 @@ omit =
     data_migration/*
     packages/*
     weixin/*
-
+    plugin_service/*
 
 
 [xml]
