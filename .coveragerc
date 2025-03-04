@@ -3,7 +3,6 @@ source = .
 
 [report]
 omit =
-    */tests/*
     */migrations/*
     */__init__.py
     */settings.py
@@ -15,8 +14,3 @@ omit =
     data_migration/*
     packages/*
     weixin/*
-    plugin_service/*
-    api/*
-
-[xml]
-output = coverage.xml
