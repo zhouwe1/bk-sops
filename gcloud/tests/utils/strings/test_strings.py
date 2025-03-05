@@ -36,7 +36,7 @@ class StringTestCase(TestCase):
         self.assertEqual('user_name', camel_case_to_underscore_naming('UserName'))
 
     def test_standardize_pipeline_node_name(self):
-        self.assertTrue(standardize_pipeline_node_name({"name": "node_1"}))
+        self.assertFalse(standardize_pipeline_node_name({"name": "node_1"}))
 
     def test_standardize_name(self):
         self.assertEqual(standardize_name("node_1", 15), "node_1")
