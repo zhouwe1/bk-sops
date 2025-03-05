@@ -25,7 +25,7 @@ class StringTestCase(TestCase):
     def test_check_and_rename_params(self):
         params = [
             [{"project_id": "1"}, "project_id"],
-            [{"project_uid": "1"}, "project_uid"],
+            [{"category": "1"}, "category"],
         ]
         for param in params:
             _result = check_and_rename_params(*param)
