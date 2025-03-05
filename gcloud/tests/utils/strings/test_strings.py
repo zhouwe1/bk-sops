@@ -28,7 +28,7 @@ class StringTestCase(TestCase):
             [{"project_uid": "1"}, "project_uid"],
         ]
         for param in params:
-            _result = check_and_rename_params(*param[0])
+            _result = check_and_rename_params(*param)
             self.assertTrue(_result["success"])
 
     def test_camel_case_to_underscore_naming(self):
