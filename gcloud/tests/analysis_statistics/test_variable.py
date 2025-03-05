@@ -13,6 +13,7 @@ specific language governing permissions and limitations under the License.
 from django.test import TestCase
 from gcloud.analysis_statistics.variable import update_statistics
 
+
 class TestVariable(TestCase):
     def test_get_biz_list(self):
         self.assertEqual(type(update_statistics(1, 1, {"project_id": 1})), set)

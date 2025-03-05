@@ -40,4 +40,4 @@ class StringTestCase(TestCase):
 
     def test_standardize_name(self):
         self.assertEqual(standardize_name("node_1", 15), "node_1")
-        self.assertEqual(standardize_name("node_(1)", 15), "node_1")
+        self.assertEqual(standardize_name("node_<1>", 15), "node_1")
