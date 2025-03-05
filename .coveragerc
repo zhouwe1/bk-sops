@@ -3,6 +3,7 @@ source = .
 
 [report]
 omit =
+    */tests/*
     */migrations/*
     */__init__.py
     */settings.py
