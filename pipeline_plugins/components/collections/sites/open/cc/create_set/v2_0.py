@@ -209,19 +209,15 @@ class CCCreateSetService(Service):
 
         for parent_id in cc_set_parent_select:
             for set_data in set_list:
-                cc_kwargs = {
-                    "bk_biz_id": biz_cc_id,
-                    "bk_supplier_account": supplier_account,
-                    "data": {"bk_parent_id": parent_id},
-                }
-                cc_kwargs["data"].update(set_data)
+                set_data["bk_biz_id"] = biz_cc_id
+                set_data["bk_parent_id"] = parent_id
                 cc_result = client.api.create_set(
-                    cc_kwargs,
+                    set_data,
                     path_params={"bk_biz_id": biz_cc_id},
                     headers={"X-Bk-Tenant-Id": tenant_id},
                 )
                 if not cc_result["result"]:
-                    message = cc_handle_api_error("cc.create_set", cc_kwargs, cc_result)
+                    message = cc_handle_api_error("cc.create_set", set_data, cc_result)
                     self.logger.error(message)
                     data.set_outputs("ex_data", message)
                     return False

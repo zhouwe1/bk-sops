@@ -123,10 +123,9 @@ class CCUpdateSetService(Service):
 
         for set_id in cc_set_select:
             cc_kwargs = {
+                cc_set_property: cc_set_prop_value,
                 "bk_biz_id": biz_cc_id,
-                "bk_supplier_account": supplier_account,
                 "bk_set_id": set_id,
-                "data": {cc_set_property: cc_set_prop_value},
             }
             cc_result = client.api.update_set(
                 cc_kwargs,
