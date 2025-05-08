@@ -43,7 +43,10 @@ class PeriodicTaskResourceProvider(ResourceProvider):
         results = cache.get(cache_keyword)
         if results is None:
             queryset = (
-                PeriodicTask.objects.select_related("task").filter(task__name__icontains=keyword).only("task__name")
+                PeriodicTask.objects.select_related("task").filter(
+                    project__tenant_id=options["tenant_id"],
+                    task__name__icontains=keyword,
+                ).only("task__name")
             )
             if project_id:
                 queryset = queryset.filter(project__id=project_id)
@@ -75,13 +78,16 @@ class PeriodicTaskResourceProvider(ResourceProvider):
         with_path = False
 
         if not (filter.parent or filter.search or filter.resource_type_chain):
-            queryset = PeriodicTask.objects.all()
+            queryset = PeriodicTask.objects.filter(project__tenant_id=options["tenant_id"])
         elif filter.parent:
             parent_id = filter.parent["id"]
             if parent_id:
-                queryset = PeriodicTask.objects.filter(project_id=str(parent_id))
+                queryset = PeriodicTask.objects.filter(
+                    project_id=str(parent_id),
+                    project__tenant_id=options["tenant_id"],
+                )
             else:
-                queryset = PeriodicTask.objects.all()
+                queryset = PeriodicTask.objects.filter(project__tenant_id=options["tenant_id"])
         elif filter.search and filter.resource_type_chain:
             # 返回结果需要带上资源拓扑路径信息
             with_path = True
@@ -99,7 +105,10 @@ class PeriodicTaskResourceProvider(ResourceProvider):
                 periodic_task_filter |= Q(task__name__icontains=keyword)  # TODO 优化
 
             project_ids = Project.objects.filter(project_filter).values_list("id", flat=True)
-            queryset = PeriodicTask.objects.filter(project_id__in=list(project_ids)).filter(periodic_task_filter)
+            queryset = PeriodicTask.objects.filter(
+                project_id__in=list(project_ids),
+                project__tenant_id=options["tenant_id"],
+            ).filter(periodic_task_filter)
 
         count = queryset.count()
         results = [
@@ -135,7 +144,7 @@ class PeriodicTaskResourceProvider(ResourceProvider):
         if filter.ids:
             ids = [int(i) for i in filter.ids]
 
-        queryset = PeriodicTask.objects.filter(id__in=ids)
+        queryset = PeriodicTask.objects.filter(id__in=ids, project__tenant_id=options["tenant_id"])
         count = queryset.count()
 
         results = [
@@ -165,7 +174,7 @@ class PeriodicTaskResourceProvider(ResourceProvider):
         converter = PathEqDjangoQuerySetConverter(key_mapping, {"project__id": periodic_task_path_value_hook})
         filters = converter.convert(expression)
 
-        queryset = PeriodicTask.objects.filter(filters)
+        queryset = PeriodicTask.objects.filter(filters, project__tenant_id=options["tenant_id"])
         count = queryset.count()
 
         results = [

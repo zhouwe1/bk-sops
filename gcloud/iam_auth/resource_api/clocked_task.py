@@ -45,9 +45,11 @@ class ClockedTaskResourceProvider(ResourceProvider):
 
         results = cache.get(cache_keyword)
         if results is None:
-            queryset = ClockedTask.objects.filter(task_name__icontains=keyword).only("task_name")
+            project_filter = Q(tenant_id=options["tenant_id"])
             if project_id:
-                queryset = queryset.filter(project_id=project_id)
+                project_filter &= Q(project_id=project_id)
+            project_ids = Project.objects.filter(project_filter).values_list("id", flat=True)
+            queryset = ClockedTask.objects.filter(task_name__icontains=keyword, project_id__in=project_ids).only("task_name")
             results = [
                 {"id": str(clocked_task.id), "display_name": clocked_task.task_name}
                 for clocked_task in queryset[page.slice_from : page.slice_to]
@@ -72,7 +74,7 @@ class ClockedTaskResourceProvider(ResourceProvider):
         """
         if filter.attr == "iam_resource_owner":
             user_model = get_user_model()
-            users = user_model.objects.all().values_list("username", flat=True)
+            users = user_model.objects.filter(tenant_id=options["tenant_id"]).all().values_list("username", flat=True)
             results = [{"id": username, "display_name": username} for username in users]
         else:
             results = []
@@ -85,15 +87,22 @@ class ClockedTaskResourceProvider(ResourceProvider):
         """
         queryset = []
         with_path = False
+        project_queryset = Project.objects.filter(tenant_id=options["tenant_id"])
 
         if not (filter.parent or filter.search or filter.resource_type_chain):
-            queryset = ClockedTask.objects.all()
+            project_ids = project_queryset.values_list("id", flat=True)
+            queryset = ClockedTask.objects.filter(project_id__in=project_ids).all()
         elif filter.parent:
             parent_id = filter.parent["id"]
             if parent_id:
-                queryset = ClockedTask.objects.filter(project_id=str(parent_id))
+                project = Project.objects.filter(tenant_id=options["tenant_id"], id=parent_id).first()
+                if project:
+                    queryset = ClockedTask.objects.filter(project_id=str(parent_id))
+                else:
+                    queryset = ClockedTask.objects.none()
             else:
-                queryset = ClockedTask.objects.all()
+                project_ids = project_queryset.values_list("id", flat=True)
+                queryset = ClockedTask.objects.filter(project_id__in=project_ids).all()
         elif filter.search and filter.resource_type_chain:
             # 返回结果需要带上资源拓扑路径信息
             with_path = True
@@ -101,17 +110,17 @@ class ClockedTaskResourceProvider(ResourceProvider):
             project_keywords = filter.search.get("project", [])
             clocked_task_keywords = filter.search.get("clocked_task", [])
 
-            project_filter = Q()
+            project_keyword_filter = Q()
             clocked_task_filter = Q()
 
             for keyword in project_keywords:
-                project_filter |= Q(name__icontains=keyword)
+                project_keyword_filter |= Q(name__icontains=keyword)
 
             for keyword in clocked_task_keywords:
                 clocked_task_filter |= Q(task_name__icontains=keyword)
 
-            project_ids = Project.objects.filter(project_filter).values_list("id", flat=True)
-            queryset = ClockedTask.objects.filter(project_id__in=list(project_ids)).filter(clocked_task_filter)
+            project_ids = project_queryset.filter(project_keyword_filter).values_list("id", flat=True)
+            queryset = ClockedTask.objects.filter(project_id__in=project_ids).filter(clocked_task_filter)
 
         count = queryset.count()
         results = [
@@ -148,11 +157,12 @@ class ClockedTaskResourceProvider(ResourceProvider):
         """
         clocked_task 没有定义属性，只处理 filter 中的 ids 字段
         """
-        ids = []
         if filter.ids:
             ids = [int(i) for i in filter.ids]
-
-        queryset = ClockedTask.objects.filter(id__in=ids)
+            project_ids = Project.objects.filter(tenant_id=options["tenant_id"]).values_list("id", flat=True)
+            queryset = ClockedTask.objects.filter(id__in=ids, project_id__in=project_ids)
+        else:
+            queryset = ClockedTask.objects.none()
         count = queryset.count()
 
         results = [
@@ -182,7 +192,8 @@ class ClockedTaskResourceProvider(ResourceProvider):
         converter = PathEqDjangoQuerySetConverter(key_mapping, {"project_id": clocked_task_path_value_hook})
         filters = converter.convert(expression)
 
-        queryset = ClockedTask.objects.filter(filters)
+        project_ids = Project.objects.filter(tenant_id=options["tenant_id"]).values_list("id", flat=True)
+        queryset = ClockedTask.objects.filter(filters, project_id__in=project_ids)
         count = queryset.count()
 
         results = [
